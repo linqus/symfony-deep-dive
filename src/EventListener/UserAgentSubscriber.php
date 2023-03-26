@@ -4,6 +4,7 @@ namespace App\EventListener;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 class UserAgentSubscriber implements EventSubscriberInterface
@@ -19,13 +20,23 @@ class UserAgentSubscriber implements EventSubscriberInterface
     public function onKernelRequest(RequestEvent $event) 
     {
         $request = $event->getRequest();
+
+        // $request->attributes->set('_controller', function ($slug=null) {
+        //     dd($slug);
+        //     return new Response('Ive just took over a controller!');
+        // });
+
+        //dd($request->attributes);
+
         $useragent = $request->headers->get('user-agent');
         $this->logger->info(sprintf('User-Agent is: "%s"',$useragent));
+
+        //$request->attributes->set('isMac', true);
     }
 
     public static function getSubscribedEvents() {
         return [
-            RequestEvent::class => 'onKernelRequest'
+            RequestEvent::class => ['onKernelRequest',0],
         ];
     }
 }

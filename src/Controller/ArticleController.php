@@ -16,11 +16,14 @@ class ArticleController extends AbstractController
     /**
      * Currently unused: just showing a controller with a constructor!
      */
+    private $logger;
     private $isDebug;
 
-    public function __construct(bool $isDebug)
+    public function __construct(bool $isDebug, LoggerInterface $logger)
     {
         $this->isDebug = $isDebug;
+        $this->logger = $logger;
+        $this->logger->info('Controller instantiated');
     }
 
     /**
@@ -40,8 +43,17 @@ class ArticleController extends AbstractController
     /**
      * @Route("/news/{slug}", name="article_show")
      */
-    public function show(Article $article, SlackClient $slack)
+    public function show($slug, SlackClient $slack, ArticleRepository $articleRepository, $isMac)
     {
+        dump($isMac);
+        $article = $articleRepository->findOneBy([
+            'slug' => $slug,
+        ]);
+
+        if (!$article) {
+            throw $this->createNotFoundException();
+        }
+
         if ($article->getSlug() === 'khaaaaaan') {
             $slack->sendMessage('Kahn', 'Ah, Kirk, my old friend...');
         }
